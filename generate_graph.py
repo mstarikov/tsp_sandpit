@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import numpy
 import string
 import math
@@ -107,16 +109,23 @@ class Graph:
             pyplot.annotate(node.letter, (node.x, node.y))
         for edge_name, edge in self.edges.items():
             pyplot.plot(edge.x_points, edge.y_points)
-            pyplot.annotate(edge_name, edge.midpoint)
+            # pyplot.annotate(edge_name, edge.midpoint)
         pyplot.show()
 
 class Path:
     def __init__(self):
         self.edges = []
 
+    def __str__(self):
+        return self.edge_keys
+
     def add_edge(self, edge):
         if edge not in self.edges:
             self.edges.append(edge)
+
+    @property
+    def edge_keys(self):
+        return [edge.edge_keys for edge in self.edges]
 
     @property
     def get_odd_nodes(self):
@@ -159,7 +168,7 @@ class Solution:
     def add_edge_to_path(self, node = None, path=None):
         node = node or self.graph.nodes[0]
         for edge in self.graph.get_node_edges(node):
-            new_path = path or Path()
+            new_path = deepcopy(path) or Path()
             if edge.start_node.letter in new_path.nodes and edge.end_node.letter in new_path.nodes:
                 continue
             new_path.add_edge(edge)
@@ -173,10 +182,8 @@ class Solution:
         self.add_edge_to_path()
         sorted_by_distance = sorted(self.paths, key=lambda x: x.total_distance)
         # sorted_by_distance[0].plot()
-        print(
-            f'shortest path is {sorted_by_distance[0].total_distance}, '
-            f'longest is {sorted_by_distance[-1].total_distance}'
-        )
+        print(f'shortest path is {sorted_by_distance[0].total_distance} through edges {sorted_by_distance[0].edge_keys}')
+        print(f'longest is {sorted_by_distance[-1].total_distance} through edges {sorted_by_distance[-1].edge_keys}')
 
     def dijkstra(self):
         pass
